@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>비숑이 따라와요</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --mint:#ddffd0;
+    --leaf:#a8e68f;
+    --deep:#2f5d3a;
+    --soft:#5f8a68;
+    --cream:#fbfff6;
+    --butter:#fff4b5;
+    --blush:#ffd9e2;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{min-height:100%}
+  body{
+    background:var(--mint);
+    color:var(--deep);
+    font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    overflow-x:hidden;
+    position:relative;
+  }
+  @media (hover:hover){ *{cursor:none !important} }
+
+  /* 배경 동글동글 */
+  .blob{position:fixed;border-radius:50%;z-index:0;pointer-events:none}
+  .b1{width:46vmax;height:46vmax;background:#cdf7bb;top:-18vmax;left:-14vmax}
+  .b2{width:34vmax;height:34vmax;background:#e9ffd9;bottom:-14vmax;right:-10vmax}
+  .b3{width:14vmax;height:14vmax;background:var(--butter);opacity:.7;top:58vh;left:6vw}
+
+  main{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:12vh 24px 10vh}
+
+  h1{
+    font-weight:400;
+    font-size:clamp(40px,8vw,84px);
+    line-height:1.1;
+    letter-spacing:-.02em;
+    text-align:center;
+    text-shadow:0 4px 0 var(--cream);
+  }
+  .lead{
+    max-width:30ch;
+    margin:24px auto 0;
+    text-align:center;
+    font-size:clamp(18px,2.4vw,22px);
+    line-height:1.6;
+    color:var(--soft);
+  }
+  .actions{display:flex;justify-content:center;margin-top:36px}
+  .btn{
+    border:0;
+    font:inherit;
+    font-size:20px;
+    color:var(--deep);
+    background:var(--leaf);
+    padding:14px 32px;
+    border-radius:999px;
+    box-shadow:0 6px 0 #7fcc66;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(2px);box-shadow:0 4px 0 #7fcc66}
+  .btn:active{transform:translateY(6px);box-shadow:0 0 0 #7fcc66}
+  .btn:focus-visible{outline:3px dashed var(--deep);outline-offset:4px}
+
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:22px;
+    margin-top:12vh;
+  }
+  .card{
+    background:var(--cream);
+    padding:28px 26px 30px;
+    box-shadow:0 10px 0 rgba(120,200,100,.28);
+  }
+  .card:nth-child(1){border-radius:40px 40px 40px 12px}
+  .card:nth-child(2){border-radius:40px 12px 40px 40px;background:#fffbe0;transform:translateY(18px)}
+  .card:nth-child(3){border-radius:12px 40px 40px 40px;background:#fff1f4}
+  .card .emoji{
+    display:grid;place-items:center;
+    width:56px;height:56px;border-radius:50%;
+    font-size:28px;
+    background:var(--mint);
+    margin-bottom:16px;
+  }
+  .card:nth-child(2) .emoji{background:var(--butter)}
+  .card:nth-child(3) .emoji{background:var(--blush)}
+  .card h2{font-weight:400;font-size:26px;margin-bottom:8px}
+  .card p{font-size:17px;line-height:1.6;color:var(--soft)}
+
+  footer{position:relative;z-index:1;text-align:center;padding:0 24px 40px;color:var(--soft);font-size:16px}
+
+  /* ===== 강아지 커서 ===== */
+  #dog{
+    position:fixed;left:0;top:0;
+    width:84px;height:84px;
+    pointer-events:none;
+    z-index:999;
+    will-change:transform;
+    margin:-30px 0 0 -42px; /* 머리가 포인터에 오도록 */
+  }
+  #dog svg{width:100%;height:100%;overflow:visible;display:block}
+  .flip{width:100%;height:100%;transition:transform .12s linear}
+  .bob{width:100%;height:100%;transform-origin:50% 100%}
+  #dog.run .bob{animation:trot .32s ease-in-out infinite}
+  .hop{width:100%;height:100%}
+  .hop.go{animation:hop .45s cubic-bezier(.3,1.6,.5,1)}
+  .tail{transform-origin:108px 104px;animation:wag .5s ease-in-out infinite alternate}
+  #dog.run .tail{animation-duration:.2s}
+  .eye{transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
+  .tongue{opacity:0;transition:opacity .15s}
+  #dog.run .tongue{opacity:1}
+
+  @keyframes trot{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+  @keyframes hop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-26px) scale(1.08,.94)}100%{transform:translateY(0) scale(1)}}
+  @keyframes wag{from{transform:rotate(-16deg)}to{transform:rotate(16deg)}}
+  @keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+
+  .heart{
+    position:fixed;z-index:998;pointer-events:none;
+    font-size:22px;color:#ff8fab;
+    animation:floatUp .9s ease-out forwards;
+  }
+  @keyframes floatUp{
+    0%{opacity:1;transform:translate(0,0) scale(.6)}
+    100%{opacity:0;transform:translate(var(--dx),-70px) scale(1.2)}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    #dog.run .bob,.tail,.eye,.hop.go,.heart{animation:none}
+  }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <main>
+    <h1>마우스를 따라오는<br>비숑이에요</h1>
+    <p class="lead">화면 어디든 움직여 보세요. 멈추면 얌전히 기다리고, 클릭하면 폴짝 뛰어요.</p>
+    <div class="actions">
+      <button class="btn" id="treat">간식 주기</button>
+    </div>
+
+    <section class="cards">
+      <article class="card">
+        <div class="emoji">🌿</div>
+        <h2>산책</h2>
+        <p>풀냄새 나는 길을 따라 총총총 걸어요.</p>
+      </article>
+      <article class="card">
+        <div class="emoji">🍪</div>
+        <h2>간식</h2>
+        <p>버튼을 누르면 하트가 퐁퐁 올라와요.</p>
+      </article>
+      <article class="card">
+        <div class="emoji">☁️</div>
+        <h2>낮잠</h2>
+        <p>구름처럼 폭신한 털에 얼굴을 묻고 쉬어요.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>꼬리는 기분 좋으면 더 빨리 흔들려요</footer>
+
+  <!-- 비숑 캐릭터 -->
+  <div id="dog" aria-hidden="true">
+    <div class="flip" id="flip"><div class="hop" id="hop"><div class="bob">
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- 몽실몽실 털 덩어리: 같은 모양을 테두리용/채움용으로 두 번 그려서 안쪽 선이 안 보이게 함 -->
+          <g id="headFluff">
+            <circle cx="70" cy="40" r="22"/>
+            <circle cx="46" cy="50" r="20"/>
+            <circle cx="94" cy="50" r="20"/>
+            <circle cx="40" cy="74" r="18"/>
+            <circle cx="100" cy="74" r="18"/>
+            <circle cx="70" cy="86" r="22"/>
+            <circle cx="70" cy="62" r="30"/>
+          </g>
+          <g id="bodyFluff">
+            <circle cx="70" cy="110" r="20"/>
+            <circle cx="50" cy="114" r="12"/>
+            <circle cx="90" cy="114" r="12"/>
+          </g>
+        </defs>
+
+        <!-- 꼬리 -->
+        <g class="tail">
+          <circle cx="110" cy="102" r="11" fill="none" stroke="#6c8a66" stroke-width="5"/>
+          <circle cx="110" cy="102" r="11" fill="#fff"/>
+        </g>
+
+        <!-- 몸 -->
+        <use href="#bodyFluff" fill="none" stroke="#6c8a66" stroke-width="5"/>
+        <use href="#bodyFluff" fill="#fff"/>
+        <ellipse cx="56" cy="128" rx="9" ry="6" fill="#fff" stroke="#6c8a66" stroke-width="3"/>
+        <ellipse cx="84" cy="128" rx="9" ry="6" fill="#fff" stroke="#6c8a66" stroke-width="3"/>
+
+        <!-- 머리 -->
+        <use href="#headFluff" fill="none" stroke="#6c8a66" stroke-width="5"/>
+        <use href="#headFluff" fill="#fff"/>
+        <!-- 털 그림자 -->
+        <ellipse cx="70" cy="96" rx="24" ry="8" fill="#eef7e8"/>
+
+        <!-- 얼굴 -->
+        <ellipse cx="50" cy="78" rx="7" ry="4.5" fill="#ffb8c8" opacity=".6"/>
+        <ellipse cx="90" cy="78" rx="7" ry="4.5" fill="#ffb8c8" opacity=".6"/>
+        <ellipse class="eye" cx="56" cy="66" rx="4.6" ry="5.4" fill="#3a2f2a"/>
+        <ellipse class="eye" cx="84" cy="66" rx="4.6" ry="5.4" fill="#3a2f2a"/>
+        <circle cx="57.6" cy="64" r="1.6" fill="#fff"/>
+        <circle cx="85.6" cy="64" r="1.6" fill="#fff"/>
+        <path class="tongue" d="M66 86 q4 10 8 0 z" fill="#ff8fa6"/>
+        <path d="M70 80 q-4 6 -9 3 M70 80 q4 6 9 3" fill="none" stroke="#3a2f2a" stroke-width="2.2" stroke-linecap="round"/>
+        <ellipse cx="70" cy="75" rx="6" ry="4.4" fill="#3a2f2a"/>
+        <ellipse cx="68.4" cy="73.6" rx="1.8" ry="1" fill="#fff" opacity=".8"/>
+      </svg>
+    </div></div></div>
+  </div>
+
+<script>
+(() => {
+  const dog  = document.getElementById('dog');
+  const flip = document.getElementById('flip');
+  const hop  = document.getElementById('hop');
+
+  let tx = innerWidth / 2, ty = innerHeight / 2; // 목표(포인터)
+  let x = tx, y = ty;                            // 강아지 위치
+  let facing = 1;
+
+  addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; });
+
+  function tick() {
+    const dx = tx - x, dy = ty - y;
+    x += dx * 0.13;
+    y += dy * 0.13;
+
+    if (Math.abs(dx) > 8) facing = dx > 0 ? 1 : -1;
+    const moving = Math.hypot(dx, dy) > 10;
+    dog.classList.toggle('run', moving);
+
+    const tilt = Math.max(-10, Math.min(10, dx * 0.04));
+    dog.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    flip.style.transform = `scaleX(${facing}) rotate(${tilt * facing}deg)`;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // 하트 뿅
+  function hearts(px, py, n = 5) {
+    for (let i = 0; i < n; i++) {
+      const h = document.createElement('span');
+      h.className = 'heart';
+      h.textContent = '♥';
+      h.style.left = (px + (Math.random() - .5) * 50) + 'px';
+      h.style.top  = (py - 20 + (Math.random() - .5) * 20) + 'px';
+      h.style.setProperty('--dx', ((Math.random() - .5) * 60) + 'px');
+      h.style.animationDelay = (i * 60) + 'ms';
+      h.addEventListener('animationend', () => h.remove());
+      document.body.appendChild(h);
+    }
+  }
+
+  function jump() {
+    hop.classList.remove('go');
+    void hop.offsetWidth;
+    hop.classList.add('go');
+    hearts(x, y);
+  }
+
+  addEventListener('pointerdown', e => { tx = e.clientX; ty = e.clientY; jump(); });
+  document.getElementById('treat').addEventListener('click', () => hearts(x, y, 8));
+})();
+</script>
+</body>
+</html>
